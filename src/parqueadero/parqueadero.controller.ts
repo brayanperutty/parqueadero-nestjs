@@ -10,11 +10,17 @@ import { JwtService } from '@nestjs/jwt';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('parqueadero')
 export class ParqueaderoController {
-
+    
     constructor(private parqueaderoService: ParqueaderoService,
         private historialService: HistorialService,
         private jwtService: JwtService,
     ){}
+
+    @Roles('ADMIN', 'SOCIO')
+    @Get('indicador')
+    async getIndicadorGeneral(){
+        return this.parqueaderoService.getIndicadorGeneral();
+    }
 
     @Roles('ADMIN')
     @Get()
@@ -44,11 +50,12 @@ export class ParqueaderoController {
         return this.parqueaderoService.createParqueadero(parqueadero);
     }
 
+    
     @Roles('ADMIN')
     @Delete(':idParqueadero')
     deleteParqueadero(@Param('idParqueadero') param: FindOneParams){
         this.parqueaderoService.deleteParqueadero(param.idParqueadero);
-
+        
         return 'deleted';
     }
 
@@ -59,4 +66,5 @@ export class ParqueaderoController {
         const decoded = await this.jwtService.verifyAsync(token)
         return this.parqueaderoService.getListVehiculosByParqueadero(idParqueadero, decoded.username);
     }
+
 }

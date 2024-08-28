@@ -9,9 +9,10 @@ import { HistorialModule } from 'src/historial/historial.module';
 import { Usuario } from 'src/usuario/usuario.entity';
 import { Vehiculo } from 'src/vehiculo/vehiculo.entity';
 import { Ingreso } from 'src/ingreso/ingreso.entity';
+import { Historial } from 'src/historial/historial.entity';
  
 @Module({
-  imports: [TypeOrmModule.forFeature([Parqueadero, Usuario, Vehiculo, Ingreso]), HistorialModule],
+  imports: [TypeOrmModule.forFeature([Parqueadero, Usuario, Ingreso, Historial]), HistorialModule],
   controllers: [ParqueaderoController],
   providers: [ParqueaderoService, ParqueaderoResponses, ParqueaderoCreateResponse],
   exports: [ParqueaderoService]

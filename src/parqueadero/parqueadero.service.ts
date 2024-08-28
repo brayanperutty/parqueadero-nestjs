@@ -6,8 +6,8 @@ import { Repository } from 'typeorm';
 import { ParqueaderoResponses } from './responses/parqueadero.responses';
 import { ParqueaderoCreateResponse } from './responses/parqueaderoCreateResponse';
 import { Usuario } from 'src/usuario/usuario.entity';
-import { Vehiculo } from 'src/vehiculo/vehiculo.entity';
 import { Ingreso } from 'src/ingreso/ingreso.entity';
+import { Historial } from 'src/historial/historial.entity';
 
 @Injectable()
 export class ParqueaderoService {
@@ -17,10 +17,10 @@ export class ParqueaderoService {
         private parqueaderoRepository: Repository<Parqueadero>,
         @InjectRepository(Usuario)
         private usuarioRepository: Repository<Usuario>,
-        @InjectRepository(Vehiculo)
-        private vehiculoRepository: Repository<Vehiculo>,
         @InjectRepository(Ingreso)
         private ingresoRepository: Repository<Ingreso>,
+        @InjectRepository(Historial)
+        private historialRepository: Repository<Historial>,
         private parqueaderoResponse: ParqueaderoResponses,
         private parqueaderoCreateResponse: ParqueaderoCreateResponse
     ) { }
@@ -84,7 +84,6 @@ export class ParqueaderoService {
             const parqueaderos = await this.parqueaderoRepository.find({
                 where: { socios: { idUsuario: idSocio } },
             });
-
             return parqueaderos;
         }else{
             const parqueaderos = await this.parqueaderoRepository.find({
@@ -102,6 +101,8 @@ export class ParqueaderoService {
                 },
                 relations: ['vehiculo'],
             });
+            
+            console.log(ingresos)
             return ingresos.map(ingreso => ingreso.vehiculo);
         }else{
             const ingresos = await this.ingresoRepository.find({
@@ -112,5 +113,15 @@ export class ParqueaderoService {
             });
             return ingresos.length !== 0 ? ingresos.map(ingreso => ingreso.vehiculo) : (() => {throw new HttpException('Usuario no permitido para esta operación', HttpStatus.BAD_REQUEST)})();;
         }
+    }
+
+    async getIndicadorGeneral(){
+
+        const vehiculos = (await this.historialRepository.find({relations:['vehiculo']})).map(historial => historial.vehiculo);
+        
+        return vehiculos.reduce((registros, vehiculo) => {
+            registros[vehiculo.placa] = (registros[vehiculo.placa] || 0) + 1;
+            return registros;
+        }, {});
     }
 }
