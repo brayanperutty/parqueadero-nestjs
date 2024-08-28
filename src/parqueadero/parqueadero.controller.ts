@@ -44,10 +44,19 @@ export class ParqueaderoController {
         return this.parqueaderoService.createParqueadero(parqueadero);
     }
 
+    @Roles('ADMIN')
     @Delete(':idParqueadero')
     deleteParqueadero(@Param('idParqueadero') param: FindOneParams){
         this.parqueaderoService.deleteParqueadero(param.idParqueadero);
 
         return 'deleted';
+    }
+
+    @Roles('ADMIN', 'SOCIO')
+    @Get(':idParqueadero/vehiculos')
+    async listVehiculosByParqueadero(@Param('idParqueadero') idParqueadero: number, @Request() req){
+        const token = this.historialService.extractTokenFromHeader(req);
+        const decoded = await this.jwtService.verifyAsync(token)
+        return this.parqueaderoService.getListVehiculosByParqueadero(idParqueadero, decoded.username);
     }
 }

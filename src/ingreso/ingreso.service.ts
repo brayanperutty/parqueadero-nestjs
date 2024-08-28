@@ -35,7 +35,7 @@ export class IngresoService {
         const placa: string = ingresoDTO.placaVehiculo;
         const idParqueadero: number = ingresoDTO.idParqueadero;
 
-        if(!await this.vehiculoService.filtroVehiculo(placa)){
+        if(await this.vehiculoService.filtroVehiculo(placa) === null){
             await this.vehiculoService.createVehiculo(
                 placa, 
                 ingresoDTO.marcaVehiculo, 

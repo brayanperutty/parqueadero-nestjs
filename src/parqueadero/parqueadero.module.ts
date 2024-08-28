@@ -7,9 +7,11 @@ import { ParqueaderoResponses } from './responses/parqueadero.responses';
 import { ParqueaderoCreateResponse } from './responses/parqueaderoCreateResponse';
 import { HistorialModule } from 'src/historial/historial.module';
 import { Usuario } from 'src/usuario/usuario.entity';
+import { Vehiculo } from 'src/vehiculo/vehiculo.entity';
+import { Ingreso } from 'src/ingreso/ingreso.entity';
  
 @Module({
-  imports: [TypeOrmModule.forFeature([Parqueadero, Usuario]), HistorialModule],
+  imports: [TypeOrmModule.forFeature([Parqueadero, Usuario, Vehiculo, Ingreso]), HistorialModule],
   controllers: [ParqueaderoController],
   providers: [ParqueaderoService, ParqueaderoResponses, ParqueaderoCreateResponse],
   exports: [ParqueaderoService]

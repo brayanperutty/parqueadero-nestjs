@@ -34,7 +34,6 @@ export class VehiculoService {
             where: {placa: placa},
             relations: ['tipo']
         });
-        console.log(vehiculo)
-        return vehiculo ? vehiculo : (() => {throw new HttpException(this.vehiculoErrorResponse.vehiculoNotFound, HttpStatus.BAD_REQUEST)})();
+        return vehiculo !== null ? vehiculo : null;
     }
 }

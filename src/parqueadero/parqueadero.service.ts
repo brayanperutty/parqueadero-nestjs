@@ -6,6 +6,8 @@ import { Repository } from 'typeorm';
 import { ParqueaderoResponses } from './responses/parqueadero.responses';
 import { ParqueaderoCreateResponse } from './responses/parqueaderoCreateResponse';
 import { Usuario } from 'src/usuario/usuario.entity';
+import { Vehiculo } from 'src/vehiculo/vehiculo.entity';
+import { Ingreso } from 'src/ingreso/ingreso.entity';
 
 @Injectable()
 export class ParqueaderoService {
@@ -15,6 +17,10 @@ export class ParqueaderoService {
         private parqueaderoRepository: Repository<Parqueadero>,
         @InjectRepository(Usuario)
         private usuarioRepository: Repository<Usuario>,
+        @InjectRepository(Vehiculo)
+        private vehiculoRepository: Repository<Vehiculo>,
+        @InjectRepository(Ingreso)
+        private ingresoRepository: Repository<Ingreso>,
         private parqueaderoResponse: ParqueaderoResponses,
         private parqueaderoCreateResponse: ParqueaderoCreateResponse
     ) { }
@@ -88,8 +94,23 @@ export class ParqueaderoService {
         }
     }
 
-
-
-
-
+    async getListVehiculosByParqueadero(idParqueadero: number, correo: string){
+        if((await this.usuarioRepository.findOne({where: {correo: correo}})).idRol.tipo === "ADMIN"){
+            const ingresos = await this.ingresoRepository.find({
+                where: {
+                    parqueadero: { idParqueadero: idParqueadero }
+                },
+                relations: ['vehiculo'],
+            });
+            return ingresos.map(ingreso => ingreso.vehiculo);
+        }else{
+            const ingresos = await this.ingresoRepository.find({
+                where: {
+                    parqueadero: { idParqueadero: idParqueadero, socios: {correo : correo} }
+                },
+                relations: ['vehiculo'],
+            });
+            return ingresos.length !== 0 ? ingresos.map(ingreso => ingreso.vehiculo) : (() => {throw new HttpException('Usuario no permitido para esta operación', HttpStatus.BAD_REQUEST)})();;
+        }
+    }
 }
