@@ -45,14 +45,20 @@ export class UsuarioController {
 
     @Roles('ADMIN')
     @Post('vincular/:idUsuario')
-    vincularSocioParqueadero(@Param('idUsuario') idUsuario: number, @Body() idParqueadero: ParqueaderoVincularDTO){
-        return this.usuarioService.vincularSocioParqueadero(idUsuario, idParqueadero);
+    vincularSocioParqueadero(@Param('idUsuario') idUsuario: number, @Body() idParqueaderos: ParqueaderoVincularDTO){
+        return this.usuarioService.vincularSocioParqueadero(idUsuario, idParqueaderos);
     }
 
     @Roles('ADMIN')
     @Delete(':idUsuario')
     deleteUsuario(@Param('idUsuario') idUsuario: number){
         return this.usuarioService.deleteUsuario(idUsuario);
+    }
+
+    @Roles('ADMIN')
+    @Post('desvincular/:idUsuario')
+    desvincularSocioParqueadero(@Param('idUsuario') idUsuario: number, @Body() idParqueaderos: ParqueaderoVincularDTO){
+        return this.usuarioService.desvincularSocioParqueadero(idUsuario, idParqueaderos)
     }
     
 }

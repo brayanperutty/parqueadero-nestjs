@@ -10,11 +10,12 @@ import { ParqueaderoModule } from 'src/parqueadero/parqueadero.module';
 import { ParqueaderoResponses } from 'src/parqueadero/responses/parqueadero.responses';
 import { UsuarioCreateResponse } from './responses/usuario.create.response';
 import { UsuarioVinculacionResponse } from './responses/usuario.vinculacion.response';
+import { UsuarioDesvincularResponse } from './responses/usuario.desvincular.response';
 
 @Module({
   imports:[TypeOrmModule.forFeature([Usuario, Parqueadero]), RolModule, ParqueaderoModule],
   controllers: [UsuarioController],
-  providers: [UsuarioService, UsuarioResponses, ParqueaderoResponses, UsuarioCreateResponse, UsuarioVinculacionResponse],
+  providers: [UsuarioService, UsuarioResponses, ParqueaderoResponses, UsuarioCreateResponse, UsuarioVinculacionResponse, UsuarioDesvincularResponse],
   exports: [UsuarioService]
 })
 export class UsuarioModule {}

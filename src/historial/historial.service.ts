@@ -87,11 +87,8 @@ export class HistorialService {
 
     private async getValidatePlacaParqueadero(placa: string, idParqueadero: number): Promise<Ingreso>{
 
-        const vehiculo = await this.vehiculoRepository.findOneBy({placa});
-        const parqueadero = await this.parqueaderoRepository.findOneBy({idParqueadero});
-
         const ingreso = await this.ingresoRepository.findOne({
-            where: {vehiculo: vehiculo || IsNull(), parqueadero: parqueadero || IsNull()},
+            where: {vehiculo: { placa }, parqueadero: {idParqueadero}},
             relations: ['vehiculo', 'vehiculo.tipo', 'parqueadero'],
         });
 

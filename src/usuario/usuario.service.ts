@@ -10,6 +10,7 @@ import { Parqueadero } from '../parqueadero/parqueadero.entity';
 import { ParqueaderoVincularDTO } from 'src/parqueadero/dto/parqueaderoVincular.dto';
 import { UsuarioVinculacionResponse } from './responses/usuario.vinculacion.response';
 import { UsuarioCreateResponse } from './responses/usuario.create.response';
+import { UsuarioDesvincularResponse } from './responses/usuario.desvincular.response';
 
 @Injectable()
 export class UsuarioService {
@@ -22,14 +23,15 @@ export class UsuarioService {
         private rolService: RolService,
         private usuarioResponse: UsuarioResponses,
         private usuarioCreateResponse: UsuarioCreateResponse,
-        private usuarioVinculacionResponse: UsuarioVinculacionResponse
+        private usuarioVinculacionResponse: UsuarioVinculacionResponse,
+        private usuarioDesvinculacionResponse: UsuarioDesvincularResponse,
     ) { }
 
     getListUsuarios(): Promise<Usuario[]> {
         return this.usersRepository.find();
     }
 
-    getUsuario(idUsuario: number): Promise<Usuario | null> {
+    getUsuario(idUsuario: number): Promise<Usuario> {
         const usuario = this.usersRepository.findOneBy({ idUsuario });
         return this.usersRepository.findOneBy({ idUsuario }) ? usuario
             : (() => { throw new HttpException(this.usuarioResponse.usuarioNotFound, HttpStatus.BAD_REQUEST) })();
@@ -82,14 +84,6 @@ export class UsuarioService {
             where: { idUsuario: idUsuario },
             relations: ['parqueaderos'],
         });
-        const fecha = new Date();
-        const fechaFormateada = fecha.getDate() + "/" +
-                                (fecha.getMonth() + 1) + "/" + 
-                                fecha.getFullYear() + " " +
-                                fecha.getHours() + ":" +
-                                fecha.getMinutes() + ":" +
-                                fecha.getSeconds();
-        console.log(fechaFormateada)
         for(const p of idParqueaderos.idParqueadero) {
 
             const parqueadero = await this.parqueaderoRepository.findOne({ where: { idParqueadero: p } });
@@ -107,6 +101,22 @@ export class UsuarioService {
 
         await this.usersRepository.save(usuario);
         return this.usuarioVinculacionResponse;
+    }
+
+    async desvincularSocioParqueadero(idUsuario: number, idParqueaderos: ParqueaderoVincularDTO){
+        const usuario = await this.usersRepository.findOne({
+            where: {idUsuario: idUsuario},
+            relations: ['parqueaderos'],
+        });
+
+        for(const p of idParqueaderos.idParqueadero) {
+            const parqueadero = await this.parqueaderoRepository.findOne({ where: { idParqueadero: p } });
+            usuario.parqueaderos = usuario.parqueaderos.filter(parqueadero => parqueadero.idParqueadero !== p);
+        }
+
+        await this.usersRepository.save(usuario);
+
+        return this.usuarioDesvinculacionResponse;
     }
 
 }

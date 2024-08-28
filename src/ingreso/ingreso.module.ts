@@ -11,7 +11,7 @@ import { IngresoCreateResponse } from './responses/ingreso.create.response';
 import { TipoVehiculo } from 'src/tipo_vehiculo/tipo_vehiculo.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Ingreso, Vehiculo, Parqueadero, TipoVehiculo])],
+  imports: [TypeOrmModule.forFeature([Ingreso, Parqueadero, TipoVehiculo]), VehiculoModule],
   providers: [IngresoService, IngresoErrorResponse, IngresoCreateResponse],
   controllers: [IngresoController],
   exports: [IngresoService]
