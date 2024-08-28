@@ -1,15 +1,20 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Request, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ParqueaderoService } from './parqueadero.service';
 import { CreateParqueaderoDTO, FindOneParams } from './dto/parqueadero.dto';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
 import { RolesGuard } from 'src/rol/roles.guard';
 import { Roles } from 'src/rol/rol-constants';
+import { HistorialService } from 'src/historial/historial.service';
+import { JwtService } from '@nestjs/jwt';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('parqueadero')
 export class ParqueaderoController {
 
-    constructor(private parqueaderoService: ParqueaderoService){}
+    constructor(private parqueaderoService: ParqueaderoService,
+        private historialService: HistorialService,
+        private jwtService: JwtService,
+    ){}
 
     @Roles('ADMIN')
     @Get()
@@ -19,8 +24,11 @@ export class ParqueaderoController {
 
     @Roles('ADMIN', 'SOCIO')
     @Get(':idSocio')
-    getListParqueaderosBySocio(@Param('idSocio') idSocio: number){
-        return this.parqueaderoService.getListParqueaderosBySocio(idSocio);
+    async getListParqueaderosBySocio(@Param('idSocio') idSocio: number, @Request() req){
+        
+        const token = this.historialService.extractTokenFromHeader(req);
+        const decoded = await this.jwtService.verifyAsync(token)
+        return this.parqueaderoService.getListParqueaderosBySocio(idSocio, decoded.username);
     }
 
     @Roles('ADMIN', 'SOCIO')

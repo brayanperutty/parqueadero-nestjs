@@ -49,8 +49,7 @@ export class UsuarioService {
     }
 
     async createUsuario(usuarioDTO: CreateUsuarioDTO) {
-        const cedula = usuarioDTO.cedula;
-        if (this.usersRepository.findOneBy({ cedula })) {
+        if (!this.usersRepository.findOne({ where: { cedula: usuarioDTO.cedula} })) {
             throw new HttpException(this.usuarioResponse.usuarioYaRegistrado, HttpStatus.BAD_REQUEST);
         } else {
 
@@ -60,7 +59,7 @@ export class UsuarioService {
             const usuario = new Usuario();
             var idUsuario = Math.floor(Math.random() * 1000000);
 
-            while (this.usersRepository.findOneBy({ idUsuario })) {
+            while (await this.usersRepository.findOneBy({ idUsuario })) {
                 var idUsuarioNuevo = Math.floor(Math.random() * 1000000);
                 idUsuario = idUsuarioNuevo;
             }
@@ -75,7 +74,6 @@ export class UsuarioService {
             this.usersRepository.save(usuario);
             return this.usuarioCreateResponse;
         }
-
     }
 
     async vincularSocioParqueadero(idUsuario: number, idParqueaderos: ParqueaderoVincularDTO) {
