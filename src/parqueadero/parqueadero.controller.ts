@@ -73,4 +73,10 @@ export class ParqueaderoController {
     async getVehiculosPrimeraVez(@Param('idParqueadero') idParqueadero: number){
         return this.parqueaderoService.validarPrimeraVez(idParqueadero);
     }
+
+    @Roles('SOCIO')
+    @Get(':idParqueadero/ganancia-dia')
+    getGananciasDelDia(@Param('idParqueadero') idParqueadero: number){
+        return this.historialService.gananciaDelDia(idParqueadero);
+    }
 }

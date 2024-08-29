@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Request, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Post, Request, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { CreateHistorialDTO } from './dto/historial.dto';
 import { HistorialService } from './historial.service';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';

@@ -3,7 +3,6 @@ import { CreateIngresoDTO } from './dto/ingreso.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Ingreso } from './ingreso.entity';
 import { Repository } from 'typeorm';
-import { Vehiculo } from 'src/vehiculo/vehiculo.entity';
 import { IngresoErrorResponse } from './responses/ingresos.error.response';
 import { Parqueadero } from 'src/parqueadero/parqueadero.entity';
 import { IngresoCreateResponse } from './responses/ingreso.create.response';

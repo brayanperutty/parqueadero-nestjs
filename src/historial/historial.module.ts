@@ -8,10 +8,11 @@ import { Ingreso } from 'src/ingreso/ingreso.entity';
 import { Vehiculo } from 'src/vehiculo/vehiculo.entity';
 import { Parqueadero } from 'src/parqueadero/parqueadero.entity';
 import { HistorialCreateResponse } from './responses/historial.create.response';
+import { Ganancia } from 'src/indicadores/ganancias';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Historial, Usuario, Ingreso, Vehiculo, Parqueadero])],
-  providers: [HistorialService, HistorialCreateResponse],
+  providers: [HistorialService, HistorialCreateResponse, Ganancia],
   controllers: [HistorialController],
   exports: [HistorialService]
 })

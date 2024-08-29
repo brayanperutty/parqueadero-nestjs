@@ -5,7 +5,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Ingreso } from './ingreso.entity';
 import { IngresoErrorResponse } from './responses/ingresos.error.response';
 import { VehiculoModule } from 'src/vehiculo/vehiculo.module';
-import { Vehiculo } from 'src/vehiculo/vehiculo.entity';
 import { Parqueadero } from 'src/parqueadero/parqueadero.entity';
 import { IngresoCreateResponse } from './responses/ingreso.create.response';
 import { TipoVehiculo } from 'src/tipo_vehiculo/tipo_vehiculo.entity';

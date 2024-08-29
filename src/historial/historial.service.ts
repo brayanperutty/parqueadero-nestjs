@@ -1,13 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Historial } from './historial.entity';
-import { IsNull, Repository } from 'typeorm';
+import { Between, IsNull, Repository } from 'typeorm';
 import { Usuario } from 'src/usuario/usuario.entity';
 import { CreateHistorialDTO } from './dto/historial.dto';
 import { Ingreso } from 'src/ingreso/ingreso.entity';
-import { Vehiculo } from 'src/vehiculo/vehiculo.entity';
-import { Parqueadero } from 'src/parqueadero/parqueadero.entity';
 import { HistorialCreateResponse } from './responses/historial.create.response';
+import { Ganancia } from 'src/indicadores/ganancias';
 
 @Injectable()
 export class HistorialService {
@@ -18,10 +17,6 @@ export class HistorialService {
                 private usuarioRepository: Repository<Usuario>,
                 @InjectRepository(Ingreso)
                 private ingresoRepository: Repository<Ingreso>,
-                @InjectRepository(Vehiculo)
-                private vehiculoRepository: Repository<Vehiculo>,
-                @InjectRepository(Parqueadero)
-                private parqueaderoRepository: Repository<Parqueadero>,
                 private historialCreateResponse: HistorialCreateResponse,
     ){}
 
@@ -98,6 +93,25 @@ export class HistorialService {
     extractTokenFromHeader(request: any): string | undefined {
         const [type, token] = request.headers.authorization?.split(' ') || [];
         return type === 'Bearer' ? token : undefined;
+    }
+
+    async gananciaDelDia(idParqueadero: number){
+
+        const fecha = new Date();
+        const inicioDelDia = new Date(fecha.setHours(0, 0, 0, 0));
+        const finDelDia = new Date(fecha.setHours(23, 59, 59, 999));
+
+        const salidas = await this.historialRepository.find({
+            where: {
+                parqueadero: {idParqueadero},
+                fechaHoraSalida: Between(inicioDelDia, finDelDia),
+            }
+        });
+
+        const totalGanancia = salidas.reduce((total, salida) => BigInt(total) + BigInt(salida.cobro), BigInt(0));
+        const ganancia = new Ganancia();
+        ganancia.ganancia = Number(totalGanancia);
+        return JSON.stringify(ganancia);
     }
 
 }
