@@ -35,7 +35,7 @@ export class HistorialService {
     async createHistorial(historialDTO: CreateHistorialDTO, correo: string){
         const ingreso = await this.getValidatePlacaParqueadero(historialDTO.placa, historialDTO.idParqueadero);
 
-        if(!await this.getValidateUsuarioParqueadero(correo)){
+        if(!await this.getValidateUsuarioParqueadero(historialDTO.idParqueadero, correo)){
            throw new HttpException('Este parqueadero no corresponde a este socio', HttpStatus.BAD_REQUEST);
         }else if(!ingreso){
             throw new HttpException('No se puede Registrar Salida, no existe la placa en el parqueadero', HttpStatus.BAD_REQUEST);
@@ -66,16 +66,39 @@ export class HistorialService {
             historial.parqueadero = ingreso.parqueadero;
             historial.vehiculo = ingreso.vehiculo;
 
-            this.historialRepository.save(historial);
-            this.ingresoRepository.delete(ingreso.idIngreso);
+            //this.historialRepository.save(historial);
+            //this.ingresoRepository.delete(ingreso.idIngreso);
 
             return this.historialCreateResponse;
         }
     }
 
-    private async getValidateUsuarioParqueadero(correo: string): Promise<boolean>{
+    async gananciaDelDia(idParqueadero: number, correo: string){
+        
+        if(!await this.getValidateUsuarioParqueadero(idParqueadero,correo)){
+            throw new HttpException('Este parqueadero no corresponde a este socio', HttpStatus.BAD_REQUEST);
+        }else{
+            const fecha = new Date();
+            const inicioDelDia = new Date(fecha.setHours(0, 0, 0, 0));
+            const finDelDia = new Date(fecha.setHours(23, 59, 59, 999));
+            
+            const salidas = await this.historialRepository.find({
+                where: {
+                    parqueadero: {idParqueadero},
+                    fechaHoraSalida: Between(inicioDelDia, finDelDia),
+                }
+            });
+            
+            const totalGanancia = salidas.reduce((total, salida) => BigInt(total) + BigInt(salida.cobro), BigInt(0));
+            const ganancia = new Ganancia();
+            ganancia.ganancia = Number(totalGanancia);
+            return JSON.stringify(ganancia);
+        }
+    }
+    
+    private async getValidateUsuarioParqueadero(idParqueadero: number, correo: string): Promise<boolean>{
         const usuario = await this.usuarioRepository.findOne({
-            where: {correo: correo},
+            where: {correo: correo, parqueaderos: {idParqueadero}},
         });
         return usuario === null ? false : true;
     }
@@ -93,25 +116,6 @@ export class HistorialService {
     extractTokenFromHeader(request: any): string | undefined {
         const [type, token] = request.headers.authorization?.split(' ') || [];
         return type === 'Bearer' ? token : undefined;
-    }
-
-    async gananciaDelDia(idParqueadero: number){
-
-        const fecha = new Date();
-        const inicioDelDia = new Date(fecha.setHours(0, 0, 0, 0));
-        const finDelDia = new Date(fecha.setHours(23, 59, 59, 999));
-
-        const salidas = await this.historialRepository.find({
-            where: {
-                parqueadero: {idParqueadero},
-                fechaHoraSalida: Between(inicioDelDia, finDelDia),
-            }
-        });
-
-        const totalGanancia = salidas.reduce((total, salida) => BigInt(total) + BigInt(salida.cobro), BigInt(0));
-        const ganancia = new Ganancia();
-        ganancia.ganancia = Number(totalGanancia);
-        return JSON.stringify(ganancia);
     }
 
 }

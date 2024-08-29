@@ -74,9 +74,11 @@ export class ParqueaderoController {
         return this.parqueaderoService.validarPrimeraVez(idParqueadero);
     }
 
-    @Roles('SOCIO')
+    @Roles('ADMIN', 'SOCIO')
     @Get(':idParqueadero/ganancia-dia')
-    getGananciasDelDia(@Param('idParqueadero') idParqueadero: number){
-        return this.historialService.gananciaDelDia(idParqueadero);
+    async getGananciasDelDia(@Param('idParqueadero') idParqueadero: number, @Request() req){
+        const token = this.historialService.extractTokenFromHeader(req);
+        const decoded = await this.jwtService.verifyAsync(token)
+        return this.historialService.gananciaDelDia(idParqueadero, decoded.username);
     }
 }
