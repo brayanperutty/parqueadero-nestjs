@@ -22,12 +22,13 @@ export class ParqueaderoController {
         return this.parqueaderoService.getIndicadorGeneral();
     }
 
+    
     @Roles('ADMIN')
     @Get()
     getListParqueadero(){
         return this.parqueaderoService.getListParqueadero();
     }
-
+    
     @Roles('ADMIN', 'SOCIO')
     @Get(':idSocio')
     async getListParqueaderosBySocio(@Param('idSocio') idSocio: number, @Request() req){
@@ -36,20 +37,20 @@ export class ParqueaderoController {
         const decoded = await this.jwtService.verifyAsync(token)
         return this.parqueaderoService.getListParqueaderosBySocio(idSocio, decoded.username);
     }
-
+    
     @Roles('ADMIN', 'SOCIO')
     @Get(':idParqueadero')
     getParqueadero(@Param('idParqueadero') param: FindOneParams){
         return this.parqueaderoService.getParqueadero(param.idParqueadero);
     }
-
+    
     @Roles('ADMIN')
     @Post()
     @UsePipes(new ValidationPipe({ transform: true }))
     createParqueadero(@Body() parqueadero: CreateParqueaderoDTO){
         return this.parqueaderoService.createParqueadero(parqueadero);
     }
-
+    
     
     @Roles('ADMIN')
     @Delete(':idParqueadero')
@@ -58,7 +59,7 @@ export class ParqueaderoController {
         
         return 'deleted';
     }
-
+    
     @Roles('ADMIN', 'SOCIO')
     @Get(':idParqueadero/vehiculos')
     async listVehiculosByParqueadero(@Param('idParqueadero') idParqueadero: number, @Request() req){
@@ -66,5 +67,10 @@ export class ParqueaderoController {
         const decoded = await this.jwtService.verifyAsync(token)
         return this.parqueaderoService.getListVehiculosByParqueadero(idParqueadero, decoded.username);
     }
-
+    
+    @Roles('ADMIN', 'SOCIO')
+    @Get(':idParqueadero/vehiculos/primera-vez')
+    async getVehiculosPrimeraVez(@Param('idParqueadero') idParqueadero: number){
+        return this.parqueaderoService.validarPrimeraVez(idParqueadero);
+    }
 }

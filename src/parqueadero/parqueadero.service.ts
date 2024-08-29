@@ -8,6 +8,7 @@ import { ParqueaderoCreateResponse } from './responses/parqueaderoCreateResponse
 import { Usuario } from 'src/usuario/usuario.entity';
 import { Ingreso } from 'src/ingreso/ingreso.entity';
 import { Historial } from 'src/historial/historial.entity';
+import { IndicadorGeneral } from 'src/indicadores/indicador.general';
 
 @Injectable()
 export class ParqueaderoService {
@@ -119,9 +120,42 @@ export class ParqueaderoService {
 
         const vehiculos = (await this.historialRepository.find({relations:['vehiculo']})).map(historial => historial.vehiculo);
         
-        return vehiculos.reduce((registros, vehiculo) => {
-            registros[vehiculo.placa] = (registros[vehiculo.placa] || 0) + 1;
-            return registros;
-        }, {});
+        return vehiculos.reduce((resultado, vehiculo) => {
+
+            const registroExistente = resultado.find(r => r.placa === vehiculo.placa);
+        
+            if (registroExistente) {
+
+                registroExistente.registros += 1;
+            } else {
+
+                resultado.push({ placa: vehiculo.placa, registros: 1 });
+            }
+        
+            return resultado.sort().slice(0,5);
+        }, []);
+    }
+
+    async validarPrimeraVez(idParqueadero: number){
+        const vehiculos = (await this.historialRepository.find({where: {parqueadero: {idParqueadero}}, relations:['vehiculo']})).map(historial => historial.vehiculo);
+        
+        const registros = vehiculos.reduce((resultado, vehiculo) => {
+
+            const registroExistente = resultado.find(r => r.placa === vehiculo.placa);
+        
+            if (registroExistente) {
+
+                registroExistente.registros += 1;
+            } else {
+
+                resultado.push({ placa: vehiculo.placa, registros: 1 });
+            }
+        
+            return resultado;
+        }, []);
+
+        const vehiculosPrimeraVez = registros.filter(registro => registro.registros === 1);
+
+        return vehiculosPrimeraVez;
     }
 }
